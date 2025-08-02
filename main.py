@@ -9,7 +9,7 @@ BOT_TOKEN = '8352820438:AAGCkgwc6t51rYlMZ5fiUeFHaJg9HqCEuwc'
 CHAT_ID = '727059746'
 
 import subprocess
-
+print("hello..")
 def print_chrome_version():
     try:
         result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
