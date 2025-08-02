@@ -1,3 +1,0 @@
-{"ok":true,"result":[{"update_id":232895886,
-"message":{"message_id":2,"from":{"id":727059746,"is_bot":false,"first_name":"Shahil","last_name":"Tp","language_code":"en"},"chat":{"id":727059746,"first_name":"Shahil","last_name":"Tp","type":"private"},"date":1754113221,"text":"/help","entities":[{"offset":0,"length":5,"type":"bot_command"}]}},{"update_id":232895887,
-"message":{"message_id":3,"from":{"id":727059746,"is_bot":false,"first_name":"Shahil","last_name":"Tp","language_code":"en"},"chat":{"id":727059746,"first_name":"Shahil","last_name":"Tp","type":"private"},"date":1754113228,"text":"chat id"}}]}
