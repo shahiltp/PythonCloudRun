@@ -1,9 +1,6 @@
 import requests
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service
+import undetected_chromedriver as uc
 from bs4 import BeautifulSoup
 import time
 
@@ -18,13 +15,16 @@ print("Tracking seen links...")
 def get_nissan_patrol_listings():
     print("📡 Launching headless browser...")
 
-    options = Options()
-    options.add_argument('--headless')
+    options = uc.ChromeOptions()
+    options.headless = True
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
+    #driver = uc.Chrome(options=options)
+    driver = uc.Chrome(
+    version_main=137,  # 👈 Force version 137
+    options=options
+    )
 
     url = "https://haraj.com.sa/en/search/Nissan%20Patrol"
     driver.get(url)
