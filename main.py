@@ -36,14 +36,15 @@ def get_chrome_major_version():
 # === SCRAPE HARAAJ LISTINGS ===
 def get_nissan_patrol_listings():
     print("📡 Launching headless browser...")
-    major_version = get_chrome_major_version()
+    CHROME_BINARY_PATH = "/usr/bin/chromium"
 
     options = uc.ChromeOptions()
+    options.binary_location = CHROME_BINARY_PATH
     options.headless = True
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    driver = uc.Chrome(version_main=major_version, options=options)
+    driver = uc.Chrome(options=options)
 
     url = "https://haraj.com.sa/en/search/Nissan%20Patrol"
     driver.get(url)
