@@ -2,7 +2,7 @@
 
 # Python virtual environment
 venv/
-
+chatidjson.json/
 # Other common ignored files
 __pycache__/
 *.pyc
