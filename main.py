@@ -8,6 +8,18 @@ import time
 BOT_TOKEN = '8352820438:AAGCkgwc6t51rYlMZ5fiUeFHaJg9HqCEuwc'
 CHAT_ID = '727059746'
 
+import subprocess
+
+def print_chrome_version():
+    try:
+        result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
+        print("📦 Chrome version in Railway:", result.stdout.strip())
+    except Exception as e:
+        print("⚠️ Could not detect Chrome version:", e)
+
+print_chrome_version()
+
+
 # === TRACK SEEN LISTINGS ===
 seen_links = set()
 print("Tracking seen links...")
