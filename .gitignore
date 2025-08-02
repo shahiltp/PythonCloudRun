@@ -1,0 +1,9 @@
+# .gitignore
+
+# Python virtual environment
+venv/
+
+# Other common ignored files
+__pycache__/
+*.pyc
+.DS_Store
