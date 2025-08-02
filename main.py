@@ -1,47 +1,54 @@
 import requests
 import time
-import undetected_chromedriver as uc
+import platform
+import subprocess
 from bs4 import BeautifulSoup
-import time
+import undetected_chromedriver as uc
 
 # === TELEGRAM CONFIG ===
 BOT_TOKEN = '8352820438:AAGCkgwc6t51rYlMZ5fiUeFHaJg9HqCEuwc'
 CHAT_ID = '727059746'
 
-import subprocess
-print("hello..")
-def print_chrome_version():
-    try:
-        result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
-        print("📦 Chrome version in Railway:", result.stdout.strip())
-    except Exception as e:
-        print("⚠️ Could not detect Chrome version:", e)
-
-print_chrome_version()
-
-
 # === TRACK SEEN LISTINGS ===
 seen_links = set()
-print("Tracking seen links...")
-# === FUNCTION TO SCRAPE HARAAJ FOR NISSAN PATROL ===
+print("✅ Tracking seen links...")
+
+# === DETECT CHROME VERSION ===
+def get_chrome_major_version():
+    try:
+        if platform.system() == "Windows":
+            result = subprocess.run(
+                [r"reg", "query", r"HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon", "/v", "version"],
+                capture_output=True, text=True
+            )
+            version_line = result.stdout.strip().split('\n')[-1]
+            version = version_line.split()[-1]
+        else:
+            result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
+            version = result.stdout.strip().split()[-1]
+
+        print(f"📦 Chrome version detected: {version}")
+        return int(version.split('.')[0])
+    except Exception as e:
+        print(f"⚠️ Could not detect Chrome version: {e}")
+        return None
+
+# === SCRAPE HARAAJ LISTINGS ===
 def get_nissan_patrol_listings():
     print("📡 Launching headless browser...")
+    major_version = get_chrome_major_version()
 
     options = uc.ChromeOptions()
     options.headless = True
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
 
-    #driver = uc.Chrome(options=options)
-    driver = uc.Chrome(
-    version_main=137,  # 👈 Force version 137
-    options=options
-    )
+    driver = uc.Chrome(version_main=major_version, options=options)
 
     url = "https://haraj.com.sa/en/search/Nissan%20Patrol"
     driver.get(url)
 
-    time.sleep(5)  # Let JS load
+    time.sleep(5)  # Allow JS to load
 
     soup = BeautifulSoup(driver.page_source, "html.parser")
     driver.quit()
@@ -60,7 +67,7 @@ def get_nissan_patrol_listings():
     print(f"✅ Found {len(listings)} Nissan Patrol listings.")
     return listings
 
-# === FUNCTION TO SEND TELEGRAM MESSAGE ===
+# === TELEGRAM MESSAGE SENDER ===
 def send_telegram_message(message):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     data = {
@@ -68,29 +75,31 @@ def send_telegram_message(message):
         "text": message,
         "disable_web_page_preview": True
     }
-    requests.post(url, data=data)
+    response = requests.post(url, data=data)
+    if response.status_code != 200:
+        print(f"⚠️ Telegram error: {response.text}")
 
-# === MAIN CHECK + NOTIFY LOOP ===
+# === CHECK + NOTIFY FUNCTION ===
 def check_and_notify():
     listings = get_nissan_patrol_listings()
-    print(f"Found {len(listings)} listings.")
+    print(f"🧾 Found {len(listings)} listings.")
+
     if len(listings) == 0:
-        message = "🔍 No new Nissan Patrol listings found."
-        print(len(seen_links))
-        send_telegram_message(message)
+        send_telegram_message("🔍 No new Nissan Patrol listings found.")
 
     for title, link in listings:
         if link not in seen_links:
             message = f"🚗 New Nissan Patrol listed:\n{title}\n{link}"
             send_telegram_message(message)
             seen_links.add(link)
-    print(f"Total seen links: {len(seen_links)}")
+    print(f"✅ Total seen links: {len(seen_links)}")
 
-# === LOOP TO RUN EVERY 5 MINUTES ===
+# === MAIN LOOP ===
 if __name__ == "__main__":
     while True:
         try:
             check_and_notify()
         except Exception as e:
-            print(f"Error: {e}")
-        time.sleep(1000)  # Wait 5 minutes
+            print(f"❌ Error: {e}")
+        print("⏳ Waiting for next check...")
+        time.sleep(900)  # Wait 15 minutes
